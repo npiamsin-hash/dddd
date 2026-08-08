@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบประเมินความเสี่ยงแผลกดทับ (Braden Scale ฉบับปรับปรุง)</title>
+<style>
+  :root{
+    --ink:#1c2b2d;
+    --paper:#f7f5f0;
+    --card:#ffffff;
+    --line:#dcd6c8;
+    --accent:#2f6f5e;
+    --accent-dark:#1e4a3e;
+    --danger:#b5482f;
+    --warn:#c68a1f;
+    --safe:#2f6f5e;
+    --muted:#6b6659;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Sarabun','TH Sarabun New','Noto Sans Thai',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:28px;}
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:.08em;
+    color:var(--accent);
+    font-weight:600;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:26px;
+    margin:0 0 8px;
+    color:var(--accent-dark);
+    font-weight:700;
+  }
+  .sub{color:var(--muted);font-size:14.5px;margin:0;}
+  .note{
+    background:#fff8e8;
+    border:1px solid #e8d9a8;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:13.5px;
+    color:#7a5c14;
+    margin-top:16px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .field label{
+    display:block;
+    font-weight:600;
+    margin-bottom:6px;
+    font-size:15px;
+  }
+  .field input[type=text]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:15px;
+    font-family:inherit;
+    background:#fdfcf9;
+  }
+  .field input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:560px){.two-col{grid-template-columns:1fr;}}
+
+  .cat-title{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .cat-num{
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    background:var(--accent);
+    border-radius:6px;
+    padding:2px 8px;
+  }
+  .cat-name-th{font-weight:700;font-size:17px;}
+  .cat-name-en{font-size:13px;color:var(--muted);font-style:italic;}
+  .options{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+    transition:.15s;
+    background:#fdfcf9;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.selected{border-color:var(--accent);background:#eaf3ef;}
+  .opt input{margin-top:3px;accent-color:var(--accent);flex-shrink:0;}
+  .opt .score-badge{
+    font-weight:700;
+    color:var(--accent-dark);
+    flex-shrink:0;
+    min-width:26px;
+  }
+  .opt .desc{font-size:14.5px;}
+
+  .summary{
+    position:sticky;
+    bottom:14px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 20px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .summary .score-block{display:flex;align-items:baseline;gap:10px;}
+  .summary .score-num{font-size:32px;font-weight:800;color:var(--accent-dark);}
+  .summary .score-max{font-size:14px;color:var(--muted);}
+  .risk-tag{
+    padding:6px 14px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:14px;
+    color:#fff;
+  }
+  .risk-none{background:var(--safe);}
+  .risk-mild{background:var(--warn);}
+  .risk-high{background:var(--danger);}
+  .risk-pending{background:#9a958a;}
+
+  button.submit-btn{
+    width:100%;
+    margin-top:8px;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:var(--accent-dark);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  button.submit-btn:hover{background:var(--accent);}
+  button.submit-btn:disabled{background:#b7b2a4;cursor:not-allowed;}
+
+  .result-panel{
+    display:none;
+    margin-top:18px;
+    padding:20px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:var(--card);
+  }
+  .result-panel.show{display:block;}
+  .result-panel h3{margin:0 0 10px;font-size:18px;}
+  .result-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14.5px;}
+  .result-row:last-child{border-bottom:none;}
+  .print-btn{
+    margin-top:14px;
+    padding:10px 16px;
+    border:1px solid var(--accent);
+    background:transparent;
+    color:var(--accent-dark);
+    border-radius:8px;
+    font-family:inherit;
+    font-weight:600;
+    cursor:pointer;
+  }
+  @media print{
+    .summary, .print-btn, .submit-btn{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">แบบประเมินความเสี่ยงแผลกดทับ · ฉบับปรับปรุง</div>
+    <h1>Braden Scale (ตัดหัวข้อ Activity, Mobility, Nutrition)</h1>
+    <p class="sub">ประเมินจาก 3 หมวด: การรับรู้ความรู้สึก · ความเปียกชื้นของผิวหนัง · แรงเสียดทานและแรงเฉือน</p>
+    <div class="note">
+      ⚠️ หมายเหตุ: ฉบับนี้ตัดหัวข้อ 3 (Activity) 4 (Mobility) และ 5 (Nutrition) ออกตามที่ระบุ
+      ช่วงคะแนนจึงเปลี่ยนจากมาตรฐานเดิม (6–23) เหลือ <strong>3–11 คะแนน</strong>
+      และไม่ใช่เกณฑ์แปลผล Braden Scale มาตรฐานอีกต่อไป โปรดใช้เป็นเครื่องมือคัดกรองภายในหน่วยงานเท่านั้น
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="two-col">
+      <div class="field">
+        <label for="patientName">ชื่อ-สกุล ผู้ป่วย / HN *</label>
+        <input type="text" id="patientName" placeholder="ระบุชื่อ-สกุล หรือ HN">
+      </div>
+      <div class="field">
+        <label for="assessorName">ผู้ประเมิน *</label>
+        <input type="text" id="assessorName" placeholder="ชื่อผู้ประเมิน">
+      </div>
+    </div>
+  </div>
+
+  <form id="bradenForm"></form>
+
+  <div class="summary">
+    <div class="score-block">
+      <div class="score-num" id="scoreNum">0</div>
+      <div class="score-max">/ 11 คะแนน</div>
+    </div>
+    <div class="risk-tag risk-pending" id="riskTag">ยังประเมินไม่ครบ</div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" disabled>บันทึกผลการประเมิน</button>
+
+  <div class="result-panel" id="resultPanel">
+    <h3>สรุปผลการประเมิน</h3>
+    <div class="result-row"><span>ชื่อ-สกุล ผู้ป่วย/HN</span><span id="rName">-</span></div>
+    <div class="result-row"><span>ผู้ประเมิน</span><span id="rAssessor">-</span></div>
+    <div class="result-row"><span>วันที่/เวลา</span><span id="rDate">-</span></div>
+    <div class="result-row"><span>คะแนนรวม</span><span id="rScore">-</span></div>
+    <div class="result-row"><span>ระดับความเสี่ยง</span><span id="rRisk">-</span></div>
+    <button class="print-btn" onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button>
+  </div>
+
+</div>
+
+<script>
+const categories = [
+  {
+    num: 1,
+    nameTh: "การรับรู้ความรู้สึก",
+    nameEn: "Sensory Perception",
+    options: [
+      {v:1, d:"ไม่รู้สึกตัว ไม่ตอบสนองต่อความเจ็บปวดได้เลย สื่อสารไม่ได้ ร้องครวญคราง"},
+      {v:2, d:"ตอบสนองต่อความเจ็บปวดได้บ้าง"},
+      {v:3, d:"รับรู้และบอกได้ แต่หลับเป็นส่วนใหญ่"},
+      {v:4, d:"รู้สึกตัวปกติ"}
+    ]
+  },
+  {
+    num: 2,
+    nameTh: "ความเปียกชื้นของผิวหนัง",
+    nameEn: "Moisture",
+    options: [
+      {v:1, d:"เปียกชื้นตลอดเวลา (เช่น จากเหงื่อหรือปัสสาวะ) ต้องเปลี่ยนผ้าที่นอนบ่อยๆ"},
+      {v:2, d:"ผิวหนังมักจะเปียกชื้น ต้องเปลี่ยนผ้าปูที่นอนอย่างน้อยกะละครั้ง"},
+      {v:3, d:"เปียกชื้นบ้าง ต้องเปลี่ยนผ้าปูที่นอน 1-2 ครั้ง/วัน"},
+      {v:4, d:"ผิวแห้งปกติ"}
+    ]
+  },
+  {
+    num: 6,
+    nameTh: "แรงเสียดทานและแรงเฉือน",
+    nameEn: "Friction and Shear",
+    options: [
+      {v:1, d:"มีปัญหามาก (ต้องใช้คนช่วยยกตัวตลอดเวลา ตัวเลื่อนไถลบนเตียงบ่อย)"},
+      {v:2, d:"มีปัญหาปานกลาง (ขยับตัวได้บ้าง แต่ผิวหนังอาจเสียดสีกับผ้า)"},
+      {v:3, d:"ไม่มีปัญหา (ขยับตัวได้เองอย่างปลอดภัย)"}
+    ]
+  }
+];
+
+const formEl = document.getElementById('bradenForm');
+const maxScore = categories.reduce((s,c)=>s+Math.max(...c.options.map(o=>o.v)),0);
+document.querySelector('.score-max').textContent = `/ ${maxScore} คะแนน`;
+
+categories.forEach((cat, idx)=>{
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="cat-title">
+      <span class="cat-num">${idx+1}</span>
+      <span class="cat-name-th">${cat.nameTh}</span>
+      <span class="cat-name-en">(${cat.nameEn})</span>
+    </div>
+    <div class="options" data-cat="${cat.num}">
+      ${cat.options.map(o=>`
+        <label class="opt">
+          <input type="radio" name="cat${cat.num}" value="${o.v}">
+          <span class="score-badge">${o.v}</span>
+          <span class="desc">${o.d}</span>
+        </label>
+      `).join('')}
+    </div>
+  `;
+  formEl.appendChild(card);
+});
+
+const scoreNum = document.getElementById('scoreNum');
+const riskTag = document.getElementById('riskTag');
+const submitBtn = document.getElementById('submitBtn');
+
+function updateScore(){
+  let total = 0;
+  let answered = 0;
+  categories.forEach(cat=>{
+    const checked = formEl.querySelector(`input[name="cat${cat.num}"]:checked`);
+    if(checked){ total += parseInt(checked.value); answered++; }
+  });
+  scoreNum.textContent = total;
+
+  document.querySelectorAll('.opt').forEach(opt=>{
+    const input = opt.querySelector('input');
+    opt.classList.toggle('selected', input.checked);
+  });
+
+  if(answered < categories.length){
+    riskTag.textContent = `ยังประเมินไม่ครบ (${answered}/${categories.length})`;
+    riskTag.className = 'risk-tag risk-pending';
+    submitBtn.disabled = true;
+    return null;
+  }
+
+  let riskLabel, riskClass;
+  if(total <= 5){ riskLabel = 'เสี่ยงสูง'; riskClass = 'risk-high'; }
+  else if(total <= 8){ riskLabel = 'เสี่ยงปานกลาง'; riskClass = 'risk-mild'; }
+  else { riskLabel = 'เสี่ยงต่ำ'; riskClass = 'risk-none'; }
+
+  riskTag.textContent = riskLabel;
+  riskTag.className = `risk-tag ${riskClass}`;
+  submitBtn.disabled = false;
+  return {total, riskLabel};
+}
+
+formEl.addEventListener('change', updateScore);
+
+submitBtn.addEventListener('click', ()=>{
+  const result = updateScore();
+  const name = document.getElementById('patientName').value.trim();
+  const assessor = document.getElementById('assessorName').value.trim();
+
+  if(!name || !assessor){
+    alert('กรุณากรอกชื่อ-สกุลผู้ป่วย/HN และชื่อผู้ประเมินให้ครบถ้วน');
+    return;
+  }
+  if(!result){
+    alert('กรุณาประเมินให้ครบทุกหมวด');
+    return;
+  }
+
+  document.getElementById('rName').textContent = name;
+  document.getElementById('rAssessor').textContent = assessor;
+  document.getElementById('rDate').textContent = new Date().toLocaleString('th-TH', {dateStyle:'long', timeStyle:'short'});
+  document.getElementById('rScore').textContent = `${result.total} / ${maxScore}`;
+  document.getElementById('rRisk').textContent = result.riskLabel;
+
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('resultPanel').scrollIntoView({behavior:'smooth', block:'start'});
+});
+</script>
+</body>
+</html>
